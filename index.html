@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="theme-color" content="#0f1116" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <title>Pennywise — Budget Tracker</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script defer src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script type="module" src="js/app.js"></script>
+</head>
+<body>
+  <header class="app-header">
+    <h1>💸 Pennywise</h1>
+    <div id="installTip" class="install hidden">Share → Add to Home Screen to install</div>
+  </header>
+
+  <nav class="tabs">
+    <button data-tab="home" class="active">Home</button>
+    <button data-tab="log">Log</button>
+    <button data-tab="budgets">Budgets</button>
+    <button data-tab="reports">Reports</button>
+    <button data-tab="settings">Settings</button>
+  </nav>
+
+  <main>
+    <section id="home" class="tab active">
+      <div class="cards">
+        <div class="card">
+          <h3>Income (This Month)</h3>
+          <div class="big" id="incomeTotal">$0</div>
+        </div>
+        <div class="card">
+          <h3>Expenses (This Month)</h3>
+          <div class="big" id="expenseTotal">$0</div>
+        </div>
+        <div class="card emphasis">
+          <h3>Left to Spend</h3>
+          <div class="big" id="leftToSpend">$0</div>
+        </div>
+      </div>
+      <div class="panel">
+        <h3>Top Categories • This Month</h3>
+        <ul class="list" id="topCategories"></ul>
+      </div>
+      <div class="panel">
+        <h3>Spending by Category</h3>
+        <canvas id="catChart" width="400" height="240"></canvas>
+      </div>
+      <button id="quickAdd" class="floating">+ Expense</button>
+    </section>
+
+    <section id="log" class="tab">
+      <form id="txForm" class="grid">
+        <input type="number" id="txAmount" placeholder="Amount" inputmode="decimal" step="0.01" required />
+        <div id="categoryChips" class="chips"></div>
+        <input type="date" id="txDate" />
+        <input type="text" id="txDesc" placeholder="Note (optional)" />
+        <label class="switch">
+          <input type="checkbox" id="txIncome" />
+          <span>Income</span>
+        </label>
+        <label class="switch">
+          <input type="checkbox" id="txRecurring" />
+          <span>Recurring</span>
+        </label>
+        <button type="submit" class="primary">Save</button>
+      </form>
+
+      <div class="panel">
+        <h3>Transactions</h3>
+        <div class="filters">
+          <input type="month" id="filterMonth" />
+          <input type="search" id="filterSearch" placeholder="Search" />
+        </div>
+        <table class="table" id="txTable">
+          <thead><tr><th>Date</th><th>Category</th><th>Note</th><th>Type</th><th class="num">Amount</th><th></th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="budgets" class="tab">
+      <form id="catForm" class="grid">
+        <input type="text" id="catName" placeholder="New category (e.g., Groceries)" required />
+        <input type="number" id="catBudget" placeholder="Monthly budget" step="0.01" />
+        <button class="primary" type="submit">Add</button>
+      </form>
+      <div class="panel">
+        <h3>Categories & Monthly Budgets</h3>
+        <table class="table" id="catTable">
+          <thead><tr><th>Category</th><th class="num">Budget</th><th class="num">Spent</th><th class="num">Left</th><th></th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="reports" class="tab">
+      <div class="panel">
+        <h3>Spending by Category (This Month)</h3>
+        <canvas id="donut" width="400" height="240"></canvas>
+      </div>
+      <div class="panel">
+        <h3>Monthly Spend (Last 12)</h3>
+        <canvas id="bars" width="400" height="240"></canvas>
+      </div>
+    </section>
+
+    <section id="settings" class="tab">
+      <div class="panel">
+        <h3>Reminders</h3>
+        <label><input type="checkbox" id="remindersOn"> Gentle logging reminders</label>
+        <select id="reminderCadence">
+          <option value="daily">Daily</option>
+          <option value="3x">3× / week</option>
+          <option value="off">Off</option>
+        </select>
+      </div>
+      <div class="panel">
+        <h3>Data</h3>
+        <button id="exportJSON">Export JSON</button>
+        <button id="exportCSV">Export CSV</button>
+        <input type="file" id="importFile" accept=".json,.csv" />
+        <button id="importBtn">Import</button>
+      </div>
+      <div class="panel danger">
+        <h3>Danger Zone</h3>
+        <button id="resetBtn">Delete all data</button>
+      </div>
+      <p class="muted">Local-only. No servers. Works offline. Install to Home Screen for the best iOS experience.</p>
+    </section>
+  </main>
+
+  <footer class="app-footer"><span>Offline‑first • Private • Add to Home Screen</span></footer>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(console.error);
+      });
+    }
+  </script>
+</body>
+</html>
